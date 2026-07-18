@@ -800,46 +800,6 @@ export const BolekSlides: React.FC<BolekSlidesProps> = ({ onShowToast, watchMode
         </div>
       </div>
     );
-  })}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* Interactive Play Controls */}
-        <div className="flex items-center justify-center gap-4 shrink-0 pt-2 border-t border-stone-800">
-          <button
-            type="button"
-            disabled={playIndex === 0}
-            onClick={() => setPlayIndex(p => p - 1)}
-            className="w-10 h-10 rounded-full bg-stone-850 hover:bg-stone-800 border border-stone-800 text-stone-300 flex items-center justify-center disabled:opacity-30 disabled:hover:bg-stone-850 cursor-pointer transition active:scale-95"
-            title="Previous"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-
-          <div className="flex gap-1.5">
-            {project.slides.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setPlayIndex(i)}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${i === playIndex ? 'bg-orange-500 scale-125' : 'bg-stone-700 hover:bg-stone-500'}`}
-              />
-            ))}
-          </div>
-
-          <button
-            type="button"
-            disabled={playIndex === project.slides.length - 1}
-            onClick={() => setPlayIndex(p => p + 1)}
-            className="w-10 h-10 rounded-full bg-stone-850 hover:bg-stone-800 border border-stone-800 text-stone-300 flex items-center justify-center disabled:opacity-30 disabled:hover:bg-stone-850 cursor-pointer transition active:scale-95"
-            title="Next"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-    );
   }
 
   return (
