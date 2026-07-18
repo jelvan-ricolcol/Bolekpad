@@ -622,7 +622,7 @@ export const BolekSlides: React.FC<BolekSlidesProps> = ({ onShowToast, watchMode
                       <img
                         src={el.content}
                         alt="Slide graphic"
-                        className="w-full h-full object-cover rounded-xl shadow-md select-none pointer-events-none"
+                        className="w-full h-full object-contain rounded-xl shadow-md select-none pointer-events-none"
                         referrerPolicy="no-referrer"
                       />
                     ) : (
@@ -682,31 +682,40 @@ export const BolekSlides: React.FC<BolekSlidesProps> = ({ onShowToast, watchMode
   if (isWatchOnly) {
     const playSlide = project.slides[playIndex] || project.slides[0];
     return (
-      <div className="w-full min-h-[500px] flex-1 bg-stone-900 border border-stone-800 rounded-3xl p-6 flex flex-col justify-between select-none relative overflow-hidden">
-        {/* Watching Banner */}
-        <div className="flex items-center justify-between bg-stone-950/75 border border-stone-800/80 rounded-2xl px-5 py-3 text-stone-200 shadow-lg">
-          <div className="flex items-center gap-2.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-            <span className="text-xs font-black tracking-widest uppercase font-mono text-stone-300">
-              Shared Slides Presentation (Watch-Only)
+      <div className="fixed inset-0 bg-stone-950 z-[99999] flex flex-col justify-between p-6 md:p-8 select-none font-sans overflow-hidden">
+        {/* Watching Banner - Premium Redesign */}
+        <div className="flex items-center justify-between bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl px-6 py-4 text-stone-200 shadow-2xl mx-auto w-full max-w-[1000px]">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-500/20">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-black tracking-widest uppercase font-mono text-white">
+                {project.title || 'Shared Presentation'}
+              </span>
+              <span className="text-[10px] text-stone-400 font-medium tracking-wide">
+                Live Public View
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-[11px] font-bold tracking-wider bg-white/10 text-white px-4 py-1.5 rounded-full border border-white/10 font-mono shadow-inner">
+              Slide {playIndex + 1} <span className="text-stone-400 mx-1">/</span> {project.slides.length}
             </span>
           </div>
-          <span className="text-[10px] font-black tracking-wider uppercase bg-stone-800 text-stone-300 px-3 py-1 rounded-full border border-stone-700 font-mono">
-            Slide {playIndex + 1} of {project.slides.length}
-          </span>
         </div>
 
         {/* Watch Only Slide Player Frame */}
-        <div className="flex-1 flex items-center justify-center py-8 relative">
+        <div className="flex-1 flex items-center justify-center py-6 relative">
           <AnimatePresence mode="wait">
             <motion.div
               key={playSlide.id}
-              initial={{ opacity: 0, scale: 0.97 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.03 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0, y: 15, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -15, scale: 0.98 }}
+              transition={{ duration: 0.4, ease: 'easeOut' }}
               style={getSlideBgStyle(playSlide)}
-              className="w-full max-w-[850px] aspect-[16/9] rounded-2xl shadow-2xl border border-stone-800 relative overflow-hidden shrink-0 flex items-center justify-center p-4"
+              className="w-full max-w-[1000px] aspect-[16/9] rounded-2xl shadow-[0_30px_80px_rgba(0,0,0,0.6)] border border-white/10 relative overflow-hidden shrink-0 flex items-center justify-center p-4 ring-1 ring-white/5"
             >
               {playSlide.elements.map(el => {
                 const isDark = playSlide.backgroundColor === '#1c1917' || playSlide.backgroundType === 'image';
@@ -724,12 +733,12 @@ export const BolekSlides: React.FC<BolekSlidesProps> = ({ onShowToast, watchMode
                     {el.type === 'text' ? (
                       <p
                         style={{
-                          fontSize: el.fontSize ? `${el.fontSize * 1.1}px` : '15px',
+                          fontSize: el.fontSize ? `${el.fontSize * 1.2}px` : '18px',
                           color: el.color || (isDark ? '#ffffff' : '#1c1917'),
                           fontWeight: el.fontStyle === 'bold' ? 'bold' : 'normal',
                           fontStyle: el.fontStyle === 'italic' ? 'italic' : 'normal'
                         }}
-                        className="leading-relaxed whitespace-pre-wrap select-none tracking-tight font-sans"
+                        className="leading-relaxed whitespace-pre-wrap select-none tracking-tight font-sans drop-shadow-sm"
                       >
                         {el.content}
                       </p>
@@ -737,13 +746,13 @@ export const BolekSlides: React.FC<BolekSlidesProps> = ({ onShowToast, watchMode
                       <img
                         src={el.content}
                         alt="Slide asset"
-                        className="w-full h-full object-cover rounded-xl shadow-md select-none pointer-events-none"
+                        className="w-full h-full object-contain rounded-xl shadow-md select-none pointer-events-none"
                         referrerPolicy="no-referrer"
                       />
                     ) : (
                       <iframe
                         src={getYoutubeEmbedUrl(el.content)}
-                        className="w-full h-full rounded-xl shadow border-0"
+                        className="w-full h-full rounded-xl shadow-xl border-0 ring-1 ring-black/5"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                         title="Shared YouTube element"
@@ -757,24 +766,24 @@ export const BolekSlides: React.FC<BolekSlidesProps> = ({ onShowToast, watchMode
         </div>
 
         {/* Interactive Play Controls */}
-        <div className="flex items-center justify-center gap-4 shrink-0 pt-2 border-t border-stone-800">
+        <div className="flex items-center justify-center gap-6 py-4 shrink-0 mx-auto w-full max-w-[1000px] border-t border-white/10 mt-2">
           <button
             type="button"
             disabled={playIndex === 0}
             onClick={() => setPlayIndex(p => p - 1)}
-            className="w-10 h-10 rounded-full bg-stone-850 hover:bg-stone-800 border border-stone-800 text-stone-300 flex items-center justify-center disabled:opacity-30 disabled:hover:bg-stone-850 cursor-pointer transition active:scale-95"
+            className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-white flex items-center justify-center disabled:opacity-30 disabled:hover:bg-white/10 cursor-pointer transition-all active:scale-90 shadow-lg backdrop-blur-sm"
             title="Previous"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-6 h-6" />
           </button>
 
-          <div className="flex gap-1.5">
+          <div className="flex gap-2.5 px-6 py-3 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-inner">
             {project.slides.map((_, i) => (
               <button
                 key={i}
                 type="button"
                 onClick={() => setPlayIndex(i)}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${i === playIndex ? 'bg-orange-500 scale-125' : 'bg-stone-700 hover:bg-stone-500'}`}
+                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 shadow-sm ${i === playIndex ? 'bg-emerald-400 scale-125 ring-2 ring-emerald-400/30' : 'bg-white/30 hover:bg-white/60'}`}
               />
             ))}
           </div>
@@ -783,10 +792,10 @@ export const BolekSlides: React.FC<BolekSlidesProps> = ({ onShowToast, watchMode
             type="button"
             disabled={playIndex === project.slides.length - 1}
             onClick={() => setPlayIndex(p => p + 1)}
-            className="w-10 h-10 rounded-full bg-stone-850 hover:bg-stone-800 border border-stone-800 text-stone-300 flex items-center justify-center disabled:opacity-30 disabled:hover:bg-stone-850 cursor-pointer transition active:scale-95"
+            className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-white flex items-center justify-center disabled:opacity-30 disabled:hover:bg-white/10 cursor-pointer transition-all active:scale-90 shadow-lg backdrop-blur-sm"
             title="Next"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-6 h-6" />
           </button>
         </div>
       </div>
@@ -992,7 +1001,7 @@ export const BolekSlides: React.FC<BolekSlidesProps> = ({ onShowToast, watchMode
                     <img
                       src={el.content}
                       alt="Slide asset element"
-                      className="w-full h-full object-cover rounded-xl shadow-md select-none pointer-events-none"
+                      className="w-full h-full object-contain rounded-xl shadow-md select-none pointer-events-none"
                       referrerPolicy="no-referrer"
                     />
                   ) : (
