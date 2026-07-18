@@ -265,6 +265,73 @@ export default function App() {
 
   // Apps Panel Toggle State
   const [appsPanelOpen, setAppsPanelOpen] = useState(false);
+  const [pendingApp, setPendingApp] = useState<string | null>(null);
+  const [acceptedApps, setAcceptedApps] = useState<Record<string, boolean>>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('bolek_accepted_apps') || '{}');
+    } catch (e) {
+      console.error('Failed to parse accepted apps from localStorage', e);
+      return {};
+    }
+  });
+
+  const MAX_TUTORIAL_STEPS = 2;
+  const [tutorialStep, setTutorialStep] = useState<{appId: string; featureIndex: number} | null>(null);
+  const [tutorialCanSkip, setTutorialCanSkip] = useState(false);
+
+  const startTutorial = (appId: string) => {
+    setTutorialStep({ appId, featureIndex: 0 });
+    setTutorialCanSkip(false);
+    setTimeout(() => {
+      setTutorialCanSkip(true);
+    }, 3000);
+  };
+
+  const nextTutorialStep = () => {
+    if (!tutorialStep) return;
+    setTutorialStep(prev => {
+      if (!prev) return null;
+      // Assuming each app has max 3 features to show
+      if (prev.featureIndex < MAX_TUTORIAL_STEPS) {
+        setTutorialCanSkip(false);
+        setTimeout(() => setTutorialCanSkip(true), 3000);
+        return { ...prev, featureIndex: prev.featureIndex + 1 };
+      }
+      return null;
+    });
+  };
+
+  const skipTutorial = () => {
+    setTutorialStep(null);
+  };
+
+  const handleAppLaunch = (appId: string) => {
+    setAppsPanelOpen(false);
+    if (acceptedApps[appId]) {
+      switchTab(appId);
+      if (!localStorage.getItem(`bolek_tutorial_${appId}`)) {
+        localStorage.setItem(`bolek_tutorial_${appId}`, 'true');
+        startTutorial(appId);
+      }
+    } else {
+      setPendingApp(appId);
+    }
+  };
+
+  const acceptDisclaimer = () => {
+    if (pendingApp) {
+      const newAccepted = { ...acceptedApps, [pendingApp]: true };
+      setAcceptedApps(newAccepted);
+      localStorage.setItem('bolek_accepted_apps', JSON.stringify(newAccepted));
+      switchTab(pendingApp);
+      
+      if (!localStorage.getItem(`bolek_tutorial_${pendingApp}`)) {
+        localStorage.setItem(`bolek_tutorial_${pendingApp}`, 'true');
+        startTutorial(pendingApp);
+      }
+      setPendingApp(null);
+    }
+  };
 
   // Mobile UI States
   const [isMobile, setIsMobile] = useState(false);
@@ -2234,7 +2301,7 @@ export default function App() {
             <button 
               id="appsBtn" 
               onClick={() => setAppsPanelOpen(!appsPanelOpen)}
-              className="w-9 h-9 border border-stone-200 rounded-md bg-white flex items-center justify-center cursor-pointer hover:bg-stone-50 text-stone-700" 
+              className="w-9 h-9 border border-stone-200 rounded-md bg-white flex items-center justify-center cursor-pointer hover:bg-orange-500 hover:text-white hover:border-orange-600 transition-all duration-300 active:scale-90 text-stone-700" 
               title="Apps Menu"
             >
               <svg width="16" height="16" viewBox="0 0 18 18" fill="currentColor">
@@ -2256,7 +2323,7 @@ export default function App() {
               <div className="grid grid-cols-2 gap-2 mb-3">
                 <div 
                   id="app-launch-notes" 
-                  onClick={() => { switchTab('notes'); setAppsPanelOpen(false); }}
+                  onClick={() => handleAppLaunch('notes')}
                   className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border cursor-pointer transition text-stone-900 ${activeTab === 'notes' ? 'border-stone-900 bg-stone-100/50' : 'border-stone-200 bg-stone-50 hover:bg-stone-100/80'}`}
                 >
                   <span className="material-symbols-outlined !text-xl text-stone-700">sticky_note_2</span>
@@ -2264,7 +2331,7 @@ export default function App() {
                 </div>
                 <div 
                   id="app-launch-canvas" 
-                  onClick={() => { switchTab('canvas'); setAppsPanelOpen(false); }}
+                  onClick={() => handleAppLaunch('canvas')}
                   className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border cursor-pointer transition text-stone-900 ${activeTab === 'canvas' ? 'border-stone-900 bg-stone-100/50' : 'border-stone-200 bg-stone-50 hover:bg-stone-100/80'}`}
                 >
                   <span className="material-symbols-outlined !text-xl text-stone-700">palette</span>
@@ -2272,7 +2339,7 @@ export default function App() {
                 </div>
                 <div 
                   id="app-launch-calc" 
-                  onClick={() => { switchTab('calc'); setAppsPanelOpen(false); }}
+                  onClick={() => handleAppLaunch('calc')}
                   className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border cursor-pointer transition text-stone-900 ${activeTab === 'calc' ? 'border-stone-900 bg-stone-100/50' : 'border-stone-200 bg-stone-50 hover:bg-stone-100/80'}`}
                 >
                   <span className="material-symbols-outlined !text-xl text-stone-700">calculate</span>
@@ -2280,7 +2347,7 @@ export default function App() {
                 </div>
                 <div 
                   id="app-launch-send" 
-                  onClick={() => { switchTab('send'); setAppsPanelOpen(false); }}
+                  onClick={() => handleAppLaunch('send')}
                   className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border cursor-pointer transition text-stone-900 ${activeTab === 'send' ? 'border-stone-900 bg-stone-100/50' : 'border-stone-200 bg-stone-50 hover:bg-stone-100/80'}`}
                 >
                   <span className="material-symbols-outlined !text-xl text-stone-700">outgoing_mail</span>
@@ -2288,7 +2355,7 @@ export default function App() {
                 </div>
                 <div 
                   id="app-launch-calendar" 
-                  onClick={() => { switchTab('calendar'); setAppsPanelOpen(false); }}
+                  onClick={() => handleAppLaunch('calendar')}
                   className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border cursor-pointer transition text-stone-900 ${activeTab === 'calendar' ? 'border-stone-900 bg-stone-100/50' : 'border-stone-200 bg-stone-50 hover:bg-stone-100/80'}`}
                 >
                   <span className="material-symbols-outlined !text-xl text-stone-700">calendar_month</span>
@@ -2296,7 +2363,7 @@ export default function App() {
                 </div>
                 <div 
                   id="app-launch-docs" 
-                  onClick={() => { switchTab('docs'); setAppsPanelOpen(false); }}
+                  onClick={() => handleAppLaunch('docs')}
                   className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border cursor-pointer transition text-stone-900 ${activeTab === 'docs' ? 'border-stone-900 bg-stone-100/50' : 'border-stone-200 bg-stone-50 hover:bg-stone-100/80'}`}
                 >
                   <span className="material-symbols-outlined !text-xl text-stone-700">description</span>
@@ -2304,7 +2371,7 @@ export default function App() {
                 </div>
                 <div 
                   id="app-launch-presentation" 
-                  onClick={() => { switchTab('presentation'); setAppsPanelOpen(false); }}
+                  onClick={() => handleAppLaunch('presentation')}
                   className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border cursor-pointer transition text-stone-900 ${activeTab === 'presentation' ? 'border-stone-900 bg-stone-100/50' : 'border-stone-200 bg-stone-50 hover:bg-stone-100/80'}`}
                 >
                   <span className="material-symbols-outlined !text-xl text-stone-700">presentation</span>
@@ -2312,7 +2379,7 @@ export default function App() {
                 </div>
                 <div 
                   id="app-launch-profile" 
-                  onClick={() => { switchTab('profile'); setAppsPanelOpen(false); }}
+                  onClick={() => handleAppLaunch('profile')}
                   className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border cursor-pointer transition text-stone-900 ${activeTab === 'profile' ? 'border-stone-900 bg-stone-100/50' : 'border-stone-200 bg-stone-50 hover:bg-stone-100/80'}`}
                 >
                   <span className="material-symbols-outlined !text-xl text-stone-700">person</span>
@@ -2320,24 +2387,24 @@ export default function App() {
                 </div>
                 <div 
                   id="app-launch-bolekpanel" 
-                  onClick={() => { switchTab('bolekpanel'); setAppsPanelOpen(false); }}
-                  className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border cursor-pointer transition text-stone-900 col-span-2 ${activeTab === 'bolekpanel' ? 'border-stone-900 bg-stone-100/50' : 'border-stone-200 bg-stone-50 hover:bg-stone-100/80'}`}
+                  onClick={() => handleAppLaunch('bolekpanel')}
+                  className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border cursor-pointer transition text-stone-900 ${activeTab === 'bolekpanel' ? 'border-stone-900 bg-stone-100/50' : 'border-stone-200 bg-stone-50 hover:bg-stone-100/80'}`}
                 >
                   <span className="material-symbols-outlined !text-xl text-stone-700">hub</span>
                   <span className="text-[10px] font-semibold text-center">Bolekpanel (AI Platform)</span>
                 </div>
                 <div 
                   id="app-launch-integrations" 
-                  onClick={() => { switchTab('integrations'); setAppsPanelOpen(false); }}
-                  className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border cursor-pointer transition text-stone-900 col-span-2 ${activeTab === 'integrations' ? 'border-stone-900 bg-stone-100/50' : 'border-stone-200 bg-stone-50 hover:bg-stone-100/80'}`}
+                  onClick={() => handleAppLaunch('integrations')}
+                  className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border cursor-pointer transition text-stone-900 ${activeTab === 'integrations' ? 'border-stone-900 bg-stone-100/50' : 'border-stone-200 bg-stone-50 hover:bg-stone-100/80'}`}
                 >
                   <span className="material-symbols-outlined !text-xl text-stone-700 font-normal">extension</span>
                   <span className="text-[10px] font-semibold text-center">Integrations</span>
                 </div>
                 <div 
                   id="app-launch-browser" 
-                  onClick={() => { switchTab('browser'); setAppsPanelOpen(false); }}
-                  className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border cursor-pointer transition text-stone-900 col-span-2 ${activeTab === 'browser' ? 'border-stone-900 bg-[#fffbeb]' : 'border-amber-200 bg-amber-50/50 hover:bg-amber-50'}`}
+                  onClick={() => handleAppLaunch('browser')}
+                  className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border cursor-pointer transition text-stone-900 ${activeTab === 'browser' ? 'border-stone-900 bg-[#fffbeb]' : 'border-amber-200 bg-amber-50/50 hover:bg-amber-50'}`}
                 >
                   <span className="material-symbols-outlined !text-xl text-amber-600 font-bold animate-pulse">vpn_lock</span>
                   <span className="text-[10px] font-bold text-center flex items-center gap-1 text-amber-900">
@@ -7534,6 +7601,84 @@ export default function App() {
               >
                 Cancel Creation
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Disclaimer Modal */}
+      {pendingApp && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-slide-up">
+            <div className="flex items-center gap-3 mb-4 text-orange-600">
+              <span className="material-symbols-outlined !text-3xl">security</span>
+              <h2 className="text-xl font-bold text-stone-900">Security & Privacy</h2>
+            </div>
+            <div className="text-sm text-stone-600 space-y-3 mb-6">
+              <p>
+                <strong>Data Privacy & Security:</strong> All data handled by this application is secured by Cloudflare's global security infrastructure, ensuring enterprise-grade encryption and privacy.
+              </p>
+              <p>
+                By proceeding, you acknowledge that you have read and understood our Data Privacy policies and agree to the secure handling of your data.
+              </p>
+              <p className="text-xs text-stone-400">
+                You must accept to use the application.
+              </p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button 
+                onClick={() => setPendingApp(null)}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-stone-600 hover:bg-stone-100 transition cursor-pointer"
+              >
+                Decline
+              </button>
+              <button 
+                onClick={acceptDisclaimer}
+                className="px-4 py-2 rounded-lg text-sm font-bold bg-orange-500 text-white hover:bg-orange-600 transition shadow-lg shadow-orange-500/20 cursor-pointer"
+              >
+                I Acknowledge & Agree
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tutorial Overlay */}
+      {tutorialStep && (
+        <div className="fixed inset-0 z-[10001] pointer-events-none flex flex-col items-center justify-center p-4">
+          <div className="absolute inset-0 bg-stone-900/40 pointer-events-auto" onClick={() => { if(tutorialCanSkip) skipTutorial(); }}></div>
+          
+          <div className="relative z-10 max-w-sm w-full bg-white rounded-xl shadow-2xl border-2 border-red-500 p-5 pointer-events-auto animate-bounce">
+            <div className="absolute -top-3 -left-3 w-6 h-6 bg-red-500 rounded-sm animate-ping"></div>
+            
+            <h3 className="text-lg font-bold text-stone-900 mb-2 capitalize">Tutorial: {tutorialStep.appId} ({tutorialStep.featureIndex + 1}/3)</h3>
+            <p className="text-sm text-stone-600 mb-4">
+              {tutorialStep.featureIndex === 0 && `Welcome to the ${tutorialStep.appId} app! Here you can explore its main features. Click the buttons around the interface to interact.`}
+              {tutorialStep.featureIndex === 1 && `This area contains your tools and settings for ${tutorialStep.appId}.`}
+              {tutorialStep.featureIndex === 2 && `You're all set to use ${tutorialStep.appId}. Enjoy your secure experience!`}
+            </p>
+            
+            <div className="flex justify-between items-center mt-2">
+              <span className="text-xs font-semibold text-stone-400">
+                {!tutorialCanSkip ? "Wait 3 seconds to skip..." : "You can now skip or proceed."}
+              </span>
+              
+              <div className="flex gap-2">
+                <button 
+                  onClick={skipTutorial}
+                  disabled={!tutorialCanSkip}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold ${tutorialCanSkip ? 'text-stone-600 hover:bg-stone-100 cursor-pointer' : 'text-stone-300 cursor-not-allowed'}`}
+                >
+                  Skip All
+                </button>
+                <button 
+                  onClick={nextTutorialStep}
+                  disabled={!tutorialCanSkip}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold ${tutorialCanSkip ? 'bg-red-500 text-white hover:bg-red-600 cursor-pointer' : 'bg-red-300 text-white cursor-not-allowed'}`}
+                >
+                  {tutorialStep.featureIndex < MAX_TUTORIAL_STEPS ? 'Next Tip' : 'Finish'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
