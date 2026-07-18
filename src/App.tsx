@@ -2457,7 +2457,7 @@ export default function App() {
                   onClick={() => handleAppLaunch('presentation')}
                   className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border cursor-pointer transition text-stone-900 ${activeTab === 'presentation' ? 'border-stone-900 bg-stone-100/50' : 'border-stone-200 bg-stone-50 hover:bg-stone-100/80'}`}
                 >
-                  <span className="material-symbols-outlined !text-xl text-stone-700">presentation</span>
+                  <span className="material-symbols-outlined !text-xl text-stone-700">slideshow</span>
                   <span className="text-[10px] font-semibold text-center">BolekSlides</span>
                 </div>
                 <div 
@@ -2633,7 +2633,7 @@ export default function App() {
             onClick={() => setActiveTab('presentation')}
             className={`tab-button px-4 py-1.5 text-xs text-stone-500 border border-transparent rounded-t-md flex items-center gap-1.5 cursor-pointer ${activeTab === 'presentation' ? 'active' : ''}`}
           >
-            <span className="material-symbols-outlined !text-sm">presentation</span>
+            <span className="material-symbols-outlined !text-sm">slideshow</span>
             BolekSlides
             <span 
               id="close-presentation-tab" 
