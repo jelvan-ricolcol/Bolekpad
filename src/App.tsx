@@ -269,11 +269,13 @@ export default function App() {
   const [acceptedApps, setAcceptedApps] = useState<Record<string, boolean>>(() => {
     try {
       return JSON.parse(localStorage.getItem('bolek_accepted_apps') || '{}');
-    } catch {
+    } catch (e) {
+      console.error('Failed to parse accepted apps from localStorage', e);
       return {};
     }
   });
 
+  const MAX_TUTORIAL_STEPS = 2;
   const [tutorialStep, setTutorialStep] = useState<{appId: string; featureIndex: number} | null>(null);
   const [tutorialCanSkip, setTutorialCanSkip] = useState(false);
 
@@ -290,7 +292,7 @@ export default function App() {
     setTutorialStep(prev => {
       if (!prev) return null;
       // Assuming each app has max 3 features to show
-      if (prev.featureIndex < 2) {
+      if (prev.featureIndex < MAX_TUTORIAL_STEPS) {
         setTutorialCanSkip(false);
         setTimeout(() => setTutorialCanSkip(true), 3000);
         return { ...prev, featureIndex: prev.featureIndex + 1 };
@@ -7646,8 +7648,8 @@ export default function App() {
         <div className="fixed inset-0 z-[10001] pointer-events-none flex flex-col items-center justify-center p-4">
           <div className="absolute inset-0 bg-stone-900/40 pointer-events-auto" onClick={() => { if(tutorialCanSkip) skipTutorial(); }}></div>
           
-          <div className="relative z-10 max-w-sm w-full bg-white rounded-xl shadow-2xl border-2 border-red-500 p-5 pointer-events-auto" style={{ animation: 'bounce 2s infinite' }}>
-            <div className="absolute -top-3 -left-3 w-6 h-6 bg-red-500 rounded-sm" style={{ animation: 'ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite' }}></div>
+          <div className="relative z-10 max-w-sm w-full bg-white rounded-xl shadow-2xl border-2 border-red-500 p-5 pointer-events-auto animate-bounce">
+            <div className="absolute -top-3 -left-3 w-6 h-6 bg-red-500 rounded-sm animate-ping"></div>
             
             <h3 className="text-lg font-bold text-stone-900 mb-2 capitalize">Tutorial: {tutorialStep.appId} ({tutorialStep.featureIndex + 1}/3)</h3>
             <p className="text-sm text-stone-600 mb-4">
@@ -7674,7 +7676,7 @@ export default function App() {
                   disabled={!tutorialCanSkip}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold ${tutorialCanSkip ? 'bg-red-500 text-white hover:bg-red-600 cursor-pointer' : 'bg-red-300 text-white cursor-not-allowed'}`}
                 >
-                  {tutorialStep.featureIndex < 2 ? 'Next Tip' : 'Finish'}
+                  {tutorialStep.featureIndex < MAX_TUTORIAL_STEPS ? 'Next Tip' : 'Finish'}
                 </button>
               </div>
             </div>
