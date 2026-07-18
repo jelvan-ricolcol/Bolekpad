@@ -6,6 +6,6 @@
     "backend"
   ],
   "scripts": {
-    "build": "rm -rf public && npm run build --workspace=legacy && cp -r legacy/dist public"
+    "build": "node -e \"fs.rmSync('public', {recursive: true, force: true})\" && npm run build --workspace=legacy && node -e \"fs.cpSync('legacy/dist', 'public', {recursive: true})\""
   }
 }
