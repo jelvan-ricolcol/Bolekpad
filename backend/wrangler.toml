@@ -1,0 +1,17 @@
+name = "bolekpad-backend"
+main = "src/index.ts"
+compatibility_date = "2024-04-05"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "bolekpad-db"
+database_id = "your-database-id-here"
+migrations_dir = "migrations"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "your-kv-id-here"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "bolekpad-assets"
