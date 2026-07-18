@@ -6,6 +6,6 @@
     "backend"
   ],
   "scripts": {
-    "build": "npm run build --workspace=legacy && rm -rf public && cp -r legacy/dist public"
+    "build": "rm -rf public && npm run build --workspace=legacy && cp -r legacy/dist public"
   }
 }
