@@ -128,6 +128,67 @@ const authenticatePasskey = async (registeredPasskeys: any[]) => {
   return { success: true };
 };
 
+const ComplianceFooter = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <>
+      <button 
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-stone-400 hover:text-stone-600 transition z-[9000] cursor-pointer bg-white/50 px-2 py-1 rounded-full backdrop-blur-sm shadow-xs border border-stone-200/50"
+      >
+        Compliance & Privacy
+      </button>
+
+      {isOpen && (
+        <div className="fixed inset-0 z-[10005] flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-md animate-fade-in">
+          <div className="bg-white border border-stone-200 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[80vh] overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-stone-100 bg-stone-50/50">
+              <h3 className="font-bold text-stone-800 text-sm">Compliance & Privacy Information</h3>
+              <button onClick={() => setIsOpen(false)} className="text-stone-400 hover:text-stone-700 transition cursor-pointer">
+                <span className="material-symbols-outlined !text-lg">close</span>
+              </button>
+            </div>
+            <div className="p-5 overflow-y-auto space-y-6 text-xs text-stone-600">
+              
+              <section>
+                <h4 className="font-bold text-stone-900 text-[13px] mb-2">Terms and Conditions</h4>
+                <p>By accessing or using this application, you agree to be bound by these terms. This application is provided "as is", without warranty of any kind. You agree not to use the service for any illegal purposes or to violate any laws in your jurisdiction.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-stone-900 text-[13px] mb-2">Privacy Policy</h4>
+                <p>We respect your privacy. All data entered into this application is processed securely. We do not sell, trade, or otherwise transfer your personal information to outside parties without your consent.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-stone-900 text-[13px] mb-2">Zero Knowledge</h4>
+                <p>This system follows zero-knowledge principles where applicable. Your sensitive notes and data are encrypted locally before transmission, meaning our servers never see your raw unencrypted data. Only you possess the keys to decrypt your information.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-stone-900 text-[13px] mb-2">Security and Privacy Assurance</h4>
+                <p>We implement a variety of security measures to maintain the safety of your personal information. Our platform uses state-of-the-art encryption protocols and regular security audits to ensure maximum protection against unauthorized access.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-stone-900 text-[13px] mb-2">Cloudflare</h4>
+                <p>All network traffic is routed through Cloudflare's global infrastructure. This provides enterprise-grade protection against DDoS attacks, ensures high availability, and enforces strict SSL/TLS encryption for all data in transit.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-stone-900 text-[13px] mb-2">App - About & Purpose</h4>
+                <p>Bolekpad is designed to be a highly secure, private workspace for managing notes, tools, and daily workflows. Its primary purpose is to provide users with a safe, distraction-free environment that prioritizes data sovereignty and individual privacy over data monetization.</p>
+              </section>
+
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
 export default function App() {
   // Routing / View state: 'login' | 'desk'
   const [view, setView] = useState<'login' | 'desk'>(() => {
@@ -278,6 +339,9 @@ export default function App() {
   const MAX_TUTORIAL_STEPS = 2;
   const [tutorialStep, setTutorialStep] = useState<{appId: string; featureIndex: number} | null>(null);
   const [tutorialCanSkip, setTutorialCanSkip] = useState(false);
+  
+  // Compliance Modal State
+  const [complianceModalOpen, setComplianceModalOpen] = useState(false);
 
   const startTutorial = (appId: string) => {
     setTutorialStep({ appId, featureIndex: 0 });
@@ -2192,6 +2256,7 @@ export default function App() {
             </div>
           </div>
         )}
+        <ComplianceFooter />
       </div>
     );
   }
@@ -2215,6 +2280,7 @@ export default function App() {
             </div>
           ))}
         </div>
+        <ComplianceFooter />
       </div>
     );
   }
@@ -7696,7 +7762,7 @@ export default function App() {
           </div>
         ))}
       </div>
-
+      <ComplianceFooter />
     </div>
   );
 }
