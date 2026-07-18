@@ -1,0 +1,7 @@
+{
+  "name": "bolekpad-monorepo",
+  "private": true,
+  "scripts": {
+    "build": "cd legacy && npm install && npm run build && cd .. && rm -rf public && cp -r legacy/dist public"
+  }
+}
