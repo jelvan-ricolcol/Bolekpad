@@ -6,6 +6,6 @@
     "backend"
   ],
   "scripts": {
-    "build": "node -e \"fs.rmSync('public', {recursive: true, force: true})\" && npm run build --workspace=legacy && node -e \"fs.cpSync('legacy/dist', 'public', {recursive: true})\""
+    "build": "node -e \"require('fs').rmSync('public', {recursive: true, force: true})\" && npm run build --workspace=legacy && node -e \"require('fs').cpSync('legacy/dist', 'public', {recursive: true})\""
   }
 }
