@@ -1,0 +1,14 @@
+{
+  "name": "bolekpad-monorepo",
+  "private": true,
+  "workspaces": [
+    "legacy",
+    "backend"
+  ],
+  "scripts": {
+    "clean": "node -e \"require('fs').rmSync('public', {recursive: true, force: true})\"",
+    "build:legacy": "npm run build --workspace=legacy",
+    "copy:public": "node -e \"require('fs').cpSync('legacy/dist', 'public', {recursive: true})\"",
+    "build": "npm run clean && npm run build:legacy && npm run copy:public"
+  }
+}
