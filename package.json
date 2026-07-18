@@ -1,7 +1,11 @@
 {
   "name": "bolekpad-monorepo",
   "private": true,
+  "workspaces": [
+    "legacy",
+    "backend"
+  ],
   "scripts": {
-    "build": "cd legacy && npm install && npm run build && cd .. && rm -rf public && cp -r legacy/dist public"
+    "build": "npm run build --workspace=legacy && rm -rf public && cp -r legacy/dist public"
   }
 }
